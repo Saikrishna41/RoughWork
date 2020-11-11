@@ -20,6 +20,7 @@ class MonsterRepo(val app: Application) {
 
     init {
 
+        getText()
     }
 
     fun getText() {
