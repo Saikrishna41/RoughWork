@@ -27,7 +27,7 @@ class MainActivityFragment : Fragment() {
 
         viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
 
-        viewModel.mRepo.monsterDatas.observe(viewLifecycleOwner, Observer {
+        viewModel.monsterDatas.observe(viewLifecycleOwner, Observer {
 
             for (monster in it) {
 

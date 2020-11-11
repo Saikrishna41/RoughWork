@@ -8,5 +8,5 @@ class SharedViewModel(app: Application) : AndroidViewModel(app){
 
     val mRepo = MonsterRepo(app)
 
-
+    val monsterDatas = mRepo.monsterDatas
 }

@@ -6,14 +6,22 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.tpinfo.roughwork.R
 import com.tpinfo.roughwork.data.Monster
+import com.tpinfo.roughwork.data.MonsterService
 import com.tpinfo.roughwork.utils.FileHelper
 import com.tpinfo.roughwork.utils.TAG
+import com.tpinfo.roughwork.utils.WEB_SERVICE_URL
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 class MonsterRepo(val app: Application) {
 
@@ -26,10 +34,15 @@ class MonsterRepo(val app: Application) {
 
     init {
 
-        getText()
+       // getText()
         if(isNetworkAvailable()) {
 
             Log.i(TAG, "Network available")
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                webService()
+            }
         }
     }
 
@@ -77,5 +90,21 @@ class MonsterRepo(val app: Application) {
         return false
     }
 
+    @WorkerThread
+    suspend fun webService() {
+
+        Log.i("TAG", "Web service called")
+        val retrofit = Retrofit.Builder()
+            .baseUrl(WEB_SERVICE_URL)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(MonsterService::class.java)
+
+        val monsterData = service.getMonsterData()
+
+        monsterDatas.postValue(monsterData.body() ?: emptyList())
+
+    }
 
 }
